@@ -1,74 +1,38 @@
-import type { Metadata, Viewport } from "next";
-import {
-  Playfair_Display,
-  Cormorant_Garamond,
-  Cinzel,
-  Great_Vibes,
-} from "next/font/google";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  display: "swap",
 });
 
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const cinzel = Cinzel({
-  variable: "--font-cinzel",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-});
-
-const greatVibes = Great_Vibes({
-  variable: "--font-great-vibes",
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Meilany & Fadhil — The Wedding",
-  description: "Undangan pernikahan digital Meilany & Fadhil. Dengan memohon rahmat Allah SWT, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri resepsi pernikahan kami.",
-  keywords: ["undangan digital", "wedding invitation", "Meilany", "Fadhil", "pernikahan"],
-  authors: [{ name: "Meilany & Fadhil" }],
+  title: "Z.ai Code Scaffold - AI-Powered Development",
+  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
+  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
+  authors: [{ name: "Z.ai Team" }],
+  icons: {
+    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+  },
   openGraph: {
-    title: "Meilany & Fadhil — The Wedding",
-    description: "Minggu, 06 Desember 2026 — Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan do'a restu kepada kami.",
+    title: "Z.ai Code Scaffold",
+    description: "AI-powered development with modern React stack",
+    url: "https://chat.z.ai",
+    siteName: "Z.ai",
     type: "website",
-    images: [
-      {
-        url: "https://imglinkv-3.vercel.app/api/images/cmtve6ge9aswqzkci/file",
-        width: 1200,
-        height: 1200,
-        alt: "Meilany & Fadhil — The Wedding",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Meilany & Fadhil — The Wedding",
-    description: "Minggu, 06 Desember 2026 — Undangan pernikahan Meilany & Fadhil",
-    images: ["https://imglinkv-3.vercel.app/api/images/cmtve6ge9aswqzkci/file"],
+    title: "Z.ai Code Scaffold",
+    description: "AI-powered development with modern React stack",
   },
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -77,9 +41,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${playfair.variable} ${cormorant.variable} ${cinzel.variable} ${greatVibes.variable} antialiased bg-white text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         {children}
         <Toaster />
