@@ -16,7 +16,7 @@ import { useInvitation } from "@/lib/invitation-store";
  *   (paling gampang & awet: taruh file .mp3 di folder /public repo, lalu
  *   isi URL-nya "/bgmusic.mp3" atau domain sendiri).
  */
-const MUSIC_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3";
+const MUSIC_URL = "https://midnight.memoraa-invitation.my.id/bgmusic.mp3";
 
 /**
  * MusicPlayer — invisible audio controller + floating toggle button.
