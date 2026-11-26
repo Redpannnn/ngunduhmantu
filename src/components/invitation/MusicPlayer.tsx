@@ -8,8 +8,15 @@ import { useInvitation } from "@/lib/invitation-store";
 /**
  * Lagu latar undangan. File di-host eksternal.
  * Ganti URL di bawah untuk mengganti lagu.
+ *
+ * ⚠ URL LAMA (https://ifalnaelil.vercel.app/bgmusic.mp3) SUDAH MATI
+ *   (HTTP 402 DEPLOYMENT_DISABLED) — makanya musik nggak pernah play.
+ *   Sekarang diarahkan ke mp3 placeholder yang aktif biar fitur autoplay
+ *   jalan. Kalau sudah punya file lagu sendiri, tinggal ganti URL ini
+ *   (paling gampang & awet: taruh file .mp3 di folder /public repo, lalu
+ *   isi URL-nya "/bgmusic.mp3" atau domain sendiri).
  */
-const MUSIC_URL = "https://ifalnaelil.vercel.app/bgmusic.mp3";
+const MUSIC_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3";
 
 /**
  * MusicPlayer — invisible audio controller + floating toggle button.
@@ -59,14 +66,14 @@ export default function MusicPlayer() {
     }
   }, [musicPlaying, setMusicPlaying]);
 
-  // Don't render anything before the invitation is opened (cover slide
-  // handles its own "Buka Undangan" button — no music there).
-  if (!opened) return null;
-
+  // Audio element SELALU di-mount (mulai dari cover) biar lagu di-preload
+  // sejak awal — pas user klik "Buka Undangan", musik langsung play tanpa
+  // nunggu download. Floating button-nya tetap baru muncul setelah dibuka.
   return (
     <>
       <audio ref={audioRef} src={MUSIC_URL} loop preload="auto" />
 
+      {opened && (
       <motion.button
         type="button"
         onClick={toggleMusic}
@@ -82,6 +89,7 @@ export default function MusicPlayer() {
           <Music2 className="size-4" />
         )}
       </motion.button>
+      )}
     </>
   );
 }
