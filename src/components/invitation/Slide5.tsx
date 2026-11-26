@@ -1,64 +1,34 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useInvitation } from "@/lib/invitation-store";
 
 const BG_IMAGE =
   "https://the.invisimple.id/wp-content/uploads/2026/03/BG-ALL-PAGE-TEMA-2-.jpg";
 
-// 9 foto Our Moment — layout masonry 3 kolom yang rapi & balance.
-// Tiling (dengan grid-flow-dense):
-//   Row1: P1 P1 P2   (P1 = big feature 2×2)
-//   Row2: P1 P1 P3
-//   Row3: P4 P5 P6
-//   Row4: P7 P8 P9
-const MOMENTS = [
-  {
-    src: "https://imglinkv-3.vercel.app/api/images/cmtve6ayyv53zdqqx/file",
-    alt: "Momen 1",
-    className: "col-span-2 row-span-2",
-  },
-  {
-    src: "https://imglinkv-3.vercel.app/api/images/cmtve6fsli5003xyd/file",
-    alt: "Momen 2",
-    className: "col-span-1 row-span-1",
-  },
-  {
-    src: "https://imglinkv-3.vercel.app/api/images/cmtve6eqk9rxkoeek/file",
-    alt: "Momen 3",
-    className: "col-span-1 row-span-1",
-  },
-  {
-    src: "https://imglinkv-3.vercel.app/api/images/cmtvn83zai9ct3rdf/file",
-    alt: "Momen 4",
-    className: "col-span-1 row-span-1",
-  },
-  {
-    src: "https://imglinkv-3.vercel.app/api/images/cmtvn85dd8xcs4f8j/file",
-    alt: "Momen 5",
-    className: "col-span-1 row-span-1",
-  },
-  {
-    src: "https://imglinkv-3.vercel.app/api/images/cmtvn87lrep9fbobq/file",
-    alt: "Momen 6",
-    className: "col-span-1 row-span-1",
-  },
-  {
-    src: "https://imglinkv-3.vercel.app/api/images/cmtvn86ob7wziof9v/file",
-    alt: "Momen 7",
-    className: "col-span-1 row-span-1",
-  },
-  {
-    src: "https://imglinkv-3.vercel.app/api/images/cmtve6dkxrrwsizst/file",
-    alt: "Momen 8",
-    className: "col-span-1 row-span-1",
-  },
-  {
-    src: "https://imglinkv-3.vercel.app/api/images/cmtve6h6sdq2yy7ey/file",
-    alt: "Momen 9",
-    className: "col-span-1 row-span-1",
-  },
+// Foto galeri Our Moment — preview besar di atas + thumbnail 1 baris di bawah.
+// Klik thumbnail → tampil di preview besar. Tombol panah prev/next di preview
+// besar buat mundur/lanjut (wrap-around, dari foto terakhir lanjut ke pertama).
+// Catatan: DSC_0232 di-list 2x, diambil 1x aja biar nggak dobel di galeri.
+const RAW_PHOTOS = [
+  "https://ik.imagekit.io/au8q7zdvt/FADHIL%20-%20MEILANY/DSC_0284.JPG",
+  "https://ik.imagekit.io/au8q7zdvt/FADHIL%20-%20MEILANY/DSC_0282.JPG",
+  "https://ik.imagekit.io/au8q7zdvt/FADHIL%20-%20MEILANY/DSC_0280.JPG",
+  "https://ik.imagekit.io/au8q7zdvt/FADHIL%20-%20MEILANY/DSC_0281.JPG",
+  "https://ik.imagekit.io/au8q7zdvt/FADHIL%20-%20MEILANY/DSC_0260.JPG",
+  "https://ik.imagekit.io/au8q7zdvt/FADHIL%20-%20MEILANY/DSC_0265.JPG",
+  "https://ik.imagekit.io/au8q7zdvt/FADHIL%20-%20MEILANY/DSC_0226.JPG",
+  "https://ik.imagekit.io/au8q7zdvt/FADHIL%20-%20MEILANY/DSC_0232.JPG",
+  "https://ik.imagekit.io/au8q7zdvt/FADHIL%20-%20MEILANY/DSC_0231.JPG",
 ];
+
+// Versi ringan via transformasi ImageKit (?tr=) biar loading cepat —
+// gambar & framing-nya sama persis, cuma di-resize. Hapus "?tr=..." kalau
+// mau pakai file asli full-size.
+const previewSrc = (src: string) => `${src}?tr=w-900,q-80`;
+const thumbSrc = (src: string) => `${src}?tr=w-160,q-70`;
 
 const container = {
   hidden: {},
@@ -75,6 +45,23 @@ const item = {
 
 export default function Slide5() {
   const goTo = useInvitation((s) => s.goTo);
+
+  // index foto yang lagi tampil di preview besar
+  const [active, setActive] = useState(0);
+  const thumbsRef = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const total = RAW_PHOTOS.length;
+  const goPrev = () => setActive((v) => (v - 1 + total) % total);
+  const goNext = () => setActive((v) => (v + 1) % total);
+
+  // Thumbnail aktif di-scroll ke tengah biar selalu kelihatan di 1 baris.
+  useEffect(() => {
+    thumbsRef.current[active]?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }, [active]);
 
   return (
     <main className="relative flex min-h-[100dvh] w-full flex-col items-center overflow-hidden bg-stone-100">
@@ -126,24 +113,77 @@ export default function Slide5() {
           className="my-6 h-px w-24 bg-gradient-to-r from-transparent via-white/40 to-transparent"
         />
 
-        {/* Gallery grid — 3 cols, asymmetric spans for a masonry feel.
-            grid-flow-dense membantu auto-placement menutup celah dengan rapi. */}
-        <div className="grid w-full auto-rows-[7rem] grid-cols-3 gap-3 [grid-auto-flow:dense] sm:auto-rows-[8rem] sm:gap-4">
-          {MOMENTS.map((m, i) => (
-            <motion.div
-              key={i}
-              variants={item}
-              className={`relative overflow-hidden rounded-2xl shadow-[0_10px_25px_-12px_rgba(60,45,25,0.45)] ${m.className}`}
-            >
-              <img
-                src={m.src}
-                alt={m.alt}
-                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+        {/* ───── Preview besar ───── */}
+        <motion.div
+          variants={item}
+          className="relative w-full"
+        >
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-white/40 shadow-[0_18px_45px_-12px_rgba(0,0,0,0.55)] ring-1 ring-white/30">
+            <AnimatePresence mode="sync">
+              <motion.img
+                key={active}
+                src={previewSrc(RAW_PHOTOS[active])}
+                alt={`Foto galeri pernikahan ${active + 1}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.55, ease: "easeInOut" }}
+                className="absolute inset-0 h-full w-full object-cover"
                 loading="lazy"
               />
-            </motion.div>
-          ))}
-        </div>
+            </AnimatePresence>
+
+            {/* Tombol prev — kiri preview besar */}
+            <button
+              type="button"
+              onClick={goPrev}
+              aria-label="Foto sebelumnya"
+              className="absolute left-2.5 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-white/70 text-[#544c39] shadow-[0_6px_18px_-6px_rgba(0,0,0,0.5)] backdrop-blur-sm transition-all hover:scale-105 hover:bg-white active:scale-95"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+
+            {/* Tombol next — kanan preview besar */}
+            <button
+              type="button"
+              onClick={goNext}
+              aria-label="Foto berikutnya"
+              className="absolute right-2.5 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-white/70 text-[#544c39] shadow-[0_6px_18px_-6px_rgba(0,0,0,0.5)] backdrop-blur-sm transition-all hover:scale-105 hover:bg-white active:scale-95"
+            >
+              <ChevronRight className="size-5" />
+            </button>
+          </div>
+        </motion.div>
+
+        {/* ───── Thumbnail — 1 baris, scroll horizontal ───── */}
+        <motion.div variants={item} className="mt-3 w-full">
+          <div className="flex w-full gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {RAW_PHOTOS.map((src, i) => (
+              <button
+                key={src}
+                ref={(el) => {
+                  thumbsRef.current[i] = el;
+                }}
+                type="button"
+                onClick={() => setActive(i)}
+                aria-label={`Lihat foto ${i + 1}`}
+                aria-current={i === active}
+                className={`relative h-[4.25rem] w-14 shrink-0 cursor-pointer overflow-hidden rounded-lg transition-all duration-300 ${
+                  i === active
+                    ? "opacity-100 ring-2 ring-[#f2cc6d]"
+                    : "opacity-55 ring-1 ring-white/30 hover:opacity-90"
+                }`}
+              >
+                <img
+                  src={thumbSrc(src)}
+                  alt={`Thumbnail foto ${i + 1}`}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </button>
+            ))}
+          </div>
+        </motion.div>
       </motion.div>
     </main>
   );
