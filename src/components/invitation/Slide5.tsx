@@ -48,18 +48,32 @@ export default function Slide5() {
 
   // index foto yang lagi tampil di preview besar
   const [active, setActive] = useState(0);
+  const stripRef = useRef<HTMLDivElement | null>(null);
   const thumbsRef = useRef<Array<HTMLButtonElement | null>>([]);
 
   const total = RAW_PHOTOS.length;
   const goPrev = () => setActive((v) => (v - 1 + total) % total);
   const goNext = () => setActive((v) => (v + 1) % total);
 
-  // Thumbnail aktif di-scroll ke tengah biar selalu kelihatan di 1 baris.
+  // Thumbnail aktif digeser ke tengah strip (scroll HORIZONTAL doang).
+  // PENTING: jangan pakai scrollIntoView di sini — scrollIntoView ikut
+  // men-scroll SEMUA ancestor, termasuk window/page, sehingga pas undangan
+  // dibuka halaman langsung lompat/smooth-scroll ke slide 5.
+  // Solusi: hitung posisi thumb aktif manual, lalu scroll strip-nya aja.
   useEffect(() => {
-    thumbsRef.current[active]?.scrollIntoView({
+    const strip = stripRef.current;
+    const el = thumbsRef.current[active];
+    if (!strip || !el) return;
+    const stripRect = strip.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    // Selisih antara titik-tengah thumb aktif dan titik-tengah strip (viewport).
+    const delta =
+      elRect.left + elRect.width / 2 - (stripRect.left + strip.clientWidth / 2);
+    // `top: strip.scrollTop` eksplisit biar posisi vertikal strip tidak berubah.
+    strip.scrollTo({
+      left: strip.scrollLeft + delta,
+      top: strip.scrollTop,
       behavior: "smooth",
-      block: "nearest",
-      inline: "center",
     });
   }, [active]);
 
@@ -157,7 +171,10 @@ export default function Slide5() {
 
         {/* ───── Thumbnail — 1 baris, scroll horizontal ───── */}
         <motion.div variants={item} className="mt-3 w-full">
-          <div className="flex w-full gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div
+            ref={stripRef}
+            className="flex w-full gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
             {RAW_PHOTOS.map((src, i) => (
               <button
                 key={src}
